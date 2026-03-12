@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Student Management System</title>
+    <style>
+        main section { display: none; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Student Management System</h1>
+        <nav>
+            <ul>
+                <li><button class="nav-btn" data-target="add-student">Add Student</button></li>
+                <li><button class="nav-btn" data-target="delete-student">Delete Student</button></li>
+                <li><button class="nav-btn" data-target="average-marks">Average Marks</button></li>
+                <li><button class="nav-btn" data-target="search-student">Search Student</button></li>
+                <li><button class="nav-btn" data-target="all-students">All Students</button></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+
+        <!-- Add Student -->
+        <section id="add-student">
+            <h2>Add Student</h2>
+            <form id="add-student-form">
+                <div>
+                    <label for="enrollment-no">Enrollment Number</label>
+                    <input type="text" id="enrollment-no" name="enrollment_no" placeholder="e.g. EN001" required />
+                </div>
+                <div>
+                    <label for="student-name">Name</label>
+                    <input type="text" id="student-name" name="name" placeholder="Full name" required />
+                </div>
+                <div>
+                    <label for="student-age">Age</label>
+                    <input type="number" id="student-age" name="age" min="1" placeholder="e.g. 20" required />
+                </div>
+                <div id="subjects-container">
+                    <h3>Subjects &amp; Marks</h3>
+                    <div class="subject-row">
+                        <input type="text" name="subject[]" placeholder="Subject name" required />
+                        <input type="number" name="mark[]" placeholder="Marks" min="0" max="100" required />
+                    </div>
+                </div>
+                <button type="button" id="add-subject-btn">+ Add Subject</button>
+                <button type="submit">Add Student</button>
+            </form>
+            <p id="add-student-message"></p>
+        </section>
+
+        <!-- Delete Student -->
+        <section id="delete-student">
+            <h2>Delete Student</h2>
+            <form id="delete-student-form">
+                <div>
+                    <label for="delete-enrollment-no">Enrollment Number</label>
+                    <input type="text" id="delete-enrollment-no" name="enrollment_no" placeholder="e.g. EN001" required />
+                </div>
+                <button type="submit">Delete Student</button>
+            </form>
+            <p id="delete-student-message"></p>
+        </section>
+
+        <!-- Average Marks -->
+        <section id="average-marks">
+            <h2>Calculate Average Marks</h2>
+            <form id="average-marks-form">
+                <div>
+                    <label for="avg-enrollment-no">Enrollment Number</label>
+                    <input type="text" id="avg-enrollment-no" name="enrollment_no" placeholder="e.g. EN001" required />
+                </div>
+                <button type="submit">Get Average</button>
+            </form>
+            <p id="average-marks-result"></p>
+        </section>
+
+        <!-- Search Student -->
+        <section id="search-student">
+            <h2>Search Student</h2>
+            <form id="search-student-form">
+                <div>
+                    <label for="search-term">Name or Enrollment Number</label>
+                    <input type="text" id="search-term" name="search_term" placeholder="Search by name or enrollment no." required />
+                </div>
+                <button type="submit">Search</button>
+            </form>
+            <div id="search-results">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Enrollment No.</th>
+                            <th>Name</th>
+                            <th>Age</th>
+                            <th>Marks</th>
+                        </tr>
+                    </thead>
+                    <tbody id="search-results-body">
+                        <!-- Search results will appear here -->
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- All Students -->
+        <section id="all-students">
+            <h2>All Students</h2>
+            <button id="load-students-btn">Load All Students</button>
+            <div id="all-students-list">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Enrollment No.</th>
+                            <th>Name</th>
+                            <th>Age</th>
+                            <th>Marks</th>
+                            <th>Average</th>
+                        </tr>
+                    </thead>
+                    <tbody id="all-students-body">
+                        <!-- All students will appear here -->
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+    </main>
+
+    <footer>
+        <p>&copy; 2026 Student Management System</p>
+    </footer>
+
+    <script>
+        // ── Accordion nav ─────────────────────────────────────────────────────
+        document.querySelectorAll('.nav-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const targetId = btn.dataset.target;
+                document.querySelectorAll('main section').forEach(sec => {
+                    sec.style.display = sec.id === targetId && sec.style.display !== 'block'
+                        ? 'block' : 'none';
+                });
+            });
+        });
+
+        // ── Helpers ───────────────────────────────────────────────────────────
+        function formatMarks(marks) {
+            return Object.entries(marks).map(([sub, m]) => `${sub}: ${m}`).join(', ');
+        }
+
+        function showMsg(id, text, ok = true) {
+            const el = document.getElementById(id);
+            el.textContent = text;
+            el.style.color = ok ? 'green' : 'red';
+        }
+
+        // ── Add Subject row ───────────────────────────────────────────────────
+        document.getElementById('add-subject-btn').addEventListener('click', () => {
+            const row = document.createElement('div');
+            row.className = 'subject-row';
+            row.innerHTML = `
+                <input type="text"   name="subject[]" placeholder="Subject name" required />
+                <input type="number" name="mark[]"    placeholder="Marks" min="0" max="100" required />
+                <button type="button" class="remove-subject-btn">✕</button>`;
+            document.getElementById('subjects-container').appendChild(row);
+            row.querySelector('.remove-subject-btn').addEventListener('click', () => row.remove());
+        });
+
+        // ── Add Student  →  POST /api/students ───────────────────────────────
+        document.getElementById('add-student-form').addEventListener('submit', async e => {
+            e.preventDefault();
+            const form = e.target;
+
+            const enrollment_no = form.querySelector('#enrollment-no').value.trim();
+            const name          = form.querySelector('#student-name').value.trim();
+            const age           = parseInt(form.querySelector('#student-age').value, 10);
+
+            const subjectInputs = form.querySelectorAll('input[name="subject[]"]');
+            const markInputs    = form.querySelectorAll('input[name="mark[]"]');
+            const marks = {};
+            subjectInputs.forEach((inp, i) => {
+                const sub = inp.value.trim();
+                if (sub) marks[sub] = parseFloat(markInputs[i].value);
+            });
+
+            const res  = await fetch('/api/students', {
+                method:  'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body:    JSON.stringify({ enrollment_no, name, age, marks })
+            });
+            const data = await res.json();
+            showMsg('add-student-message', data.message, data.success);
+
+            if (data.success) {
+                form.reset();
+                const rows = document.getElementById('subjects-container').querySelectorAll('.subject-row');
+                rows.forEach((r, i) => { if (i > 0) r.remove(); });
+            }
+        });
+
+        // ── Delete Student  →  DELETE /api/students/<id> ─────────────────────
+        document.getElementById('delete-student-form').addEventListener('submit', async e => {
+            e.preventDefault();
+            const enrollment_no = document.getElementById('delete-enrollment-no').value.trim();
+            const res  = await fetch(`/api/students/${encodeURIComponent(enrollment_no)}`, { method: 'DELETE' });
+            const data = await res.json();
+            showMsg('delete-student-message', data.message, data.success);
+            if (data.success) e.target.reset();
+        });
+
+        // ── Average Marks  →  GET /api/students/<id>/average ─────────────────
+        document.getElementById('average-marks-form').addEventListener('submit', async e => {
+            e.preventDefault();
+            const enrollment_no = document.getElementById('avg-enrollment-no').value.trim();
+            const res  = await fetch(`/api/students/${encodeURIComponent(enrollment_no)}/average`);
+            const data = await res.json();
+            if (data.success) {
+                showMsg('average-marks-result',
+                    `Average marks for Enrollment No ${enrollment_no}: ${data.average}`);
+            } else {
+                showMsg('average-marks-result', data.message, false);
+            }
+        });
+
+        // ── Search Student  →  GET /api/students/search?q= ───────────────────
+        document.getElementById('search-student-form').addEventListener('submit', async e => {
+            e.preventDefault();
+            const term    = document.getElementById('search-term').value.trim();
+            const res     = await fetch(`/api/students/search?q=${encodeURIComponent(term)}`);
+            const results = await res.json();
+            const tbody   = document.getElementById('search-results-body');
+            tbody.innerHTML = '';
+
+            if (!results.length) {
+                tbody.innerHTML = '<tr><td colspan="4">No matching students found.</td></tr>';
+                return;
+            }
+            results.forEach(s => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${s.enrollment_no}</td>
+                    <td>${s.name}</td>
+                    <td>${s.age}</td>
+                    <td>${formatMarks(s.marks)}</td>`;
+                tbody.appendChild(tr);
+            });
+        });
+
+        // ── All Students  →  GET /api/students ───────────────────────────────
+        document.getElementById('load-students-btn').addEventListener('click', async () => {
+            const res      = await fetch('/api/students');
+            const students = await res.json();
+            const tbody    = document.getElementById('all-students-body');
+            tbody.innerHTML = '';
+
+            if (!students.length) {
+                tbody.innerHTML = '<tr><td colspan="5">No students found.</td></tr>';
+                return;
+            }
+            students.forEach(s => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${s.enrollment_no}</td>
+                    <td>${s.name}</td>
+                    <td>${s.age}</td>
+                    <td>${formatMarks(s.marks)}</td>
+                    <td>${s.average}</td>`;
+                tbody.appendChild(tr);
+            });
+        });
+    </script>
+
+</body>
+</html>
