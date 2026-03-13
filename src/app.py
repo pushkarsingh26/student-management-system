@@ -7,11 +7,13 @@ import sys
 sys.path.insert(0, os.path.dirname(__file__))
 
 from flask import Flask, request, jsonify, send_from_directory
+from flask_cors import CORS
 from manager import StudentManager
 
 BASE_DIR = os.path.join(os.path.dirname(__file__), '..')
 
 app = Flask(__name__)
+CORS(app)
 manager = StudentManager()
 manager.load_students_from_json()
 
@@ -100,4 +102,4 @@ def delete_student(enrollment_no):
 if __name__ == '__main__':
     print("Starting Student Management System server...")
     print("Open http://127.0.0.1:5000 in your browser")
-    app.run(debug=True)
+    app.run(host='127.0.0.1', port=5000, debug=False)

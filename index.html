@@ -5,7 +5,224 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Student Management System</title>
     <style>
-        main section { display: none; }
+        :root {
+            --bg: #f4f7fb;
+            --card: #ffffff;
+            --text: #1f2937;
+            --muted: #6b7280;
+            --border: #e5e7eb;
+            --primary: #2563eb;
+            --primary-hover: #1d4ed8;
+            --danger: #dc2626;
+            --success: #16a34a;
+            --shadow: 0 10px 25px rgba(15, 23, 42, 0.08);
+            --radius: 12px;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            font-family: "Segoe UI", Roboto, Arial, sans-serif;
+            color: var(--text);
+            background: linear-gradient(180deg, #f8fbff 0%, var(--bg) 100%);
+            line-height: 1.45;
+        }
+
+        header {
+            padding: 28px 20px 18px;
+            background: #0f172a;
+            color: #fff;
+            box-shadow: var(--shadow);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+
+        header > h1 {
+            width: 100%;
+            max-width: 1100px;
+            text-align: center;
+        }
+
+        h1 {
+            margin: 0 0 14px;
+            font-size: clamp(1.4rem, 2.2vw, 2rem);
+        }
+
+        nav {
+            width: 100%;
+            max-width: 1100px;
+        }
+
+        nav ul {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .nav-btn {
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            border-radius: 999px;
+            padding: 8px 14px;
+            cursor: pointer;
+            transition: 0.2s ease;
+        }
+
+        .nav-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-1px);
+        }
+
+        main {
+            max-width: 1100px;
+            margin: 24px auto;
+            padding: 0 16px 24px;
+        }
+
+        main section {
+            display: none;
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            padding: 20px;
+            margin-bottom: 18px;
+        }
+
+        h2 {
+            margin: 0 0 16px;
+            font-size: 1.25rem;
+        }
+
+        h3 {
+            margin: 8px 0 10px;
+            font-size: 1rem;
+            color: var(--muted);
+        }
+
+        form > div,
+        #subjects-container {
+            margin-bottom: 12px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 600;
+            color: #374151;
+        }
+
+        input {
+            width: 100%;
+            border: 1px solid #d1d5db;
+            border-radius: 10px;
+            padding: 10px 12px;
+            font-size: 0.95rem;
+            outline: none;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.18);
+        }
+
+        .subject-row {
+            display: grid;
+            grid-template-columns: 1fr 160px auto;
+            gap: 10px;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        button {
+            border: 0;
+            border-radius: 10px;
+            background: var(--primary);
+            color: #fff;
+            padding: 10px 14px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: 0.2s ease;
+            margin-right: 8px;
+            margin-top: 4px;
+        }
+
+        button:hover {
+            background: var(--primary-hover);
+        }
+
+        .remove-subject-btn {
+            background: var(--danger);
+            margin-right: 0;
+        }
+
+        .remove-subject-btn:hover {
+            background: #b91c1c;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            overflow: hidden;
+            border-radius: 10px;
+            border: 1px solid var(--border);
+            margin-top: 10px;
+        }
+
+        thead {
+            background: #eef2ff;
+        }
+
+        th,
+        td {
+            text-align: left;
+            padding: 10px 12px;
+            border-bottom: 1px solid var(--border);
+            vertical-align: top;
+        }
+
+        tbody tr:hover {
+            background: #f9fafb;
+        }
+
+        p[id$="message"],
+        #average-marks-result {
+            margin-top: 12px;
+            font-weight: 600;
+            min-height: 20px;
+        }
+
+        footer {
+            text-align: center;
+            color: var(--muted);
+            padding: 12px 16px 24px;
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 720px) {
+            .subject-row {
+                grid-template-columns: 1fr;
+            }
+
+            nav ul {
+                gap: 8px;
+            }
+
+            .nav-btn,
+            button {
+                width: 100%;
+                margin-right: 0;
+            }
+        }
     </style>
 </head>
 <body>
@@ -133,6 +350,7 @@
 
     <footer>
         <p>&copy; 2026 Student Management System</p>
+        <p>MADE WITH ❤️ BY RYUUU....</p>
     </footer>
 
     <script>
@@ -150,6 +368,23 @@
         // ── Helpers ───────────────────────────────────────────────────────────
         function formatMarks(marks) {
             return Object.entries(marks).map(([sub, m]) => `${sub}: ${m}`).join(', ');
+        }
+
+        const API_BASE = window.location.port && window.location.port !== '5000'
+            ? `${window.location.protocol}//${window.location.hostname}:5000`
+            : '';
+
+        async function apiFetch(path, options = {}) {
+            const response = await fetch(`${API_BASE}${path}`, options);
+            const contentType = response.headers.get('content-type') || '';
+            const isJson = contentType.includes('application/json');
+            const payload = isJson ? await response.json() : { success: false, message: `Request failed (${response.status})` };
+
+            if (!response.ok) {
+                throw new Error(payload.message || `Request failed (${response.status})`);
+            }
+
+            return payload;
         }
 
         function showMsg(id, text, ok = true) {
@@ -187,18 +422,21 @@
                 if (sub) marks[sub] = parseFloat(markInputs[i].value);
             });
 
-            const res  = await fetch('/api/students', {
-                method:  'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body:    JSON.stringify({ enrollment_no, name, age, marks })
-            });
-            const data = await res.json();
-            showMsg('add-student-message', data.message, data.success);
+            try {
+                const data = await apiFetch('/api/students', {
+                    method:  'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body:    JSON.stringify({ enrollment_no, name, age, marks })
+                });
+                showMsg('add-student-message', data.message, data.success);
 
-            if (data.success) {
-                form.reset();
-                const rows = document.getElementById('subjects-container').querySelectorAll('.subject-row');
-                rows.forEach((r, i) => { if (i > 0) r.remove(); });
+                if (data.success) {
+                    form.reset();
+                    const rows = document.getElementById('subjects-container').querySelectorAll('.subject-row');
+                    rows.forEach((r, i) => { if (i > 0) r.remove(); });
+                }
+            } catch (err) {
+                showMsg('add-student-message', err.message || 'Unable to add student.', false);
             }
         });
 
@@ -206,23 +444,25 @@
         document.getElementById('delete-student-form').addEventListener('submit', async e => {
             e.preventDefault();
             const enrollment_no = document.getElementById('delete-enrollment-no').value.trim();
-            const res  = await fetch(`/api/students/${encodeURIComponent(enrollment_no)}`, { method: 'DELETE' });
-            const data = await res.json();
-            showMsg('delete-student-message', data.message, data.success);
-            if (data.success) e.target.reset();
+            try {
+                const data = await apiFetch(`/api/students/${encodeURIComponent(enrollment_no)}`, { method: 'DELETE' });
+                showMsg('delete-student-message', data.message, data.success);
+                if (data.success) e.target.reset();
+            } catch (err) {
+                showMsg('delete-student-message', err.message || 'Unable to delete student.', false);
+            }
         });
 
         // ── Average Marks  →  GET /api/students/<id>/average ─────────────────
         document.getElementById('average-marks-form').addEventListener('submit', async e => {
             e.preventDefault();
             const enrollment_no = document.getElementById('avg-enrollment-no').value.trim();
-            const res  = await fetch(`/api/students/${encodeURIComponent(enrollment_no)}/average`);
-            const data = await res.json();
-            if (data.success) {
+            try {
+                const data = await apiFetch(`/api/students/${encodeURIComponent(enrollment_no)}/average`);
                 showMsg('average-marks-result',
                     `Average marks for Enrollment No ${enrollment_no}: ${data.average}`);
-            } else {
-                showMsg('average-marks-result', data.message, false);
+            } catch (err) {
+                showMsg('average-marks-result', err.message || 'Unable to fetch average.', false);
             }
         });
 
@@ -230,10 +470,16 @@
         document.getElementById('search-student-form').addEventListener('submit', async e => {
             e.preventDefault();
             const term    = document.getElementById('search-term').value.trim();
-            const res     = await fetch(`/api/students/search?q=${encodeURIComponent(term)}`);
-            const results = await res.json();
             const tbody   = document.getElementById('search-results-body');
             tbody.innerHTML = '';
+
+            let results = [];
+            try {
+                results = await apiFetch(`/api/students/search?q=${encodeURIComponent(term)}`);
+            } catch (err) {
+                tbody.innerHTML = `<tr><td colspan="4">${err.message || 'Search failed.'}</td></tr>`;
+                return;
+            }
 
             if (!results.length) {
                 tbody.innerHTML = '<tr><td colspan="4">No matching students found.</td></tr>';
@@ -252,10 +498,16 @@
 
         // ── All Students  →  GET /api/students ───────────────────────────────
         document.getElementById('load-students-btn').addEventListener('click', async () => {
-            const res      = await fetch('/api/students');
-            const students = await res.json();
             const tbody    = document.getElementById('all-students-body');
             tbody.innerHTML = '';
+
+            let students = [];
+            try {
+                students = await apiFetch('/api/students');
+            } catch (err) {
+                tbody.innerHTML = `<tr><td colspan="5">${err.message || 'Unable to load students.'}</td></tr>`;
+                return;
+            }
 
             if (!students.length) {
                 tbody.innerHTML = '<tr><td colspan="5">No students found.</td></tr>';
