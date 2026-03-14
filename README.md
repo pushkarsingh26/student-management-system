@@ -75,23 +75,6 @@ Then open [http://127.0.0.1:5000](http://127.0.0.1:5000) in your browser.
 
 ---
 
-## Screenshots
-
-<details>
-<summary>Web UI</summary>
-
-![Web UI Screenshot](screenshot-web.png)
-
-</details>
-
-<details>
-<summary>Terminal CLI</summary>
-
-![Terminal Screenshot](screenshot-cli.png)
-
-</details>
-
----
 
 ## License
 
