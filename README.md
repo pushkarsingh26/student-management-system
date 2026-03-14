@@ -1,55 +1,98 @@
+
 # Student Management System
 
-This project is a simple Student Management System that allows users to manage student records efficiently. It provides functionalities to add, delete, and search for students, as well as calculate their average marks. The data is stored in a JSON format for easy access and manipulation.
+An all-in-one Student Management System for managing student records, built with Python. It supports both a terminal-based CLI and a modern web interface (Flask + HTML/JS).
 
-## Features
+## What does this project help with?
 
-- Add new students with their details (name, age, marks).
-- Delete existing students from the system.
-- Calculate the average marks of a student.
-- Search for students by name or ID.
-- Save and load student data in JSON format.
+- Effortlessly add, delete, search, and view students
+- Calculate average marks for each student
+- Use either a terminal or a web browser
+- Data is saved in a JSON file for persistence
+
+---
 
 ## Project Structure
 
 ```
-student-management-system
-├── src
-│   ├── main.py          # Entry point of the application
-│   ├── student.py       # Student class definition
-│   ├── manager.py       # StudentManager class for managing students
-│   ├── search.py        # Function to search for students
-│   └── utils.py         # Utility functions for JSON handling
-├── data
-│   └── students.json    # JSON file to store student data
-├── tests
-│   ├── test_student.py   # Unit tests for the Student class
-│   ├── test_manager.py   # Unit tests for the StudentManager class
-│   └── test_search.py    # Unit tests for the search function
-├── requirements.txt      # Project dependencies
-└── README.md             # Project documentation
+student-management-system/
+├── src/
+│   ├── main.py         # Terminal CLI (text-based)
+│   ├── app.py          # Flask web server (REST API)
+│   ├── student.py      # Student class
+│   ├── manager.py      # StudentManager (core logic)
+│   ├── search.py       # Search helpers
+│   └── utils.py        # JSON utilities
+├── index.html          # Web frontend (fetches from Flask API)
+├── data/
+│   └── students.json   # Student data (auto-saved)
+├── tests/
+│   ├── test_student.py
+│   ├── test_manager.py
+│   └── test_search.py
+├── requirements.txt    # Python dependencies
+└── README.md           # Project documentation
 ```
 
-## Setup Instructions
+---
 
-1. Clone the repository:
-   ```
-   git clone <repository-url>
-   ```
-2. Navigate to the project directory:
-   ```
-   cd student-management-system
-   ```
-3. Install the required dependencies:
-   ```
-   pip install -r requirements.txt
-   ```
+## How to Run
 
-## Usage
+### 1. Clone and Install
 
-To run the Student Management System, execute the following command:
+```sh
+git clone <repository-url>
+cd student-management-system
+python -m venv .venv
+.venv/Scripts/activate  # On Windows
+pip install -r requirements.txt
 ```
+
+### 2. Run in Terminal (CLI)
+
+```sh
 python src/main.py
 ```
+Follow the on-screen prompts to add, delete, search, and view students.
 
-Follow the on-screen instructions to manage student records.
+### 3. Run as a Web App
+
+```sh
+python src/app.py
+```
+Then open [http://127.0.0.1:5000](http://127.0.0.1:5000) in your browser.
+
+---
+
+## Features
+
+- Add new students (name, age, marks, enrollment number)
+- Delete students by enrollment number
+- Calculate and view average marks
+- Search by name or enrollment number
+- View all students in a table (web) or list (CLI)
+- Data is always saved to `data/students.json`
+
+---
+
+## Screenshots
+
+<details>
+<summary>Web UI</summary>
+
+![Web UI Screenshot](screenshot-web.png)
+
+</details>
+
+<details>
+<summary>Terminal CLI</summary>
+
+![Terminal Screenshot](screenshot-cli.png)
+
+</details>
+
+---
+
+## License
+
+MIT
