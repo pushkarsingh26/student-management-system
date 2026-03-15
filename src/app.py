@@ -27,16 +27,11 @@ def index():
 # ── GET all students ──────────────────────────────────────────────────────────
 @app.route('/api/students', methods=['GET'])
 def get_all_students():
-    result = []
-    for s in manager.students:
-        result.append({
-            'enrollment_no': s.enrollment_no,
-            'name':          s.name,
-            'age':           s.age,
-            'marks':         s.marks,
-            'average':       round(s.get_average_marks(), 2)
-        })
-    return jsonify(result)
+    df = manager.to_dataframe()
+    if df.empty:
+        return jsonify([])
+    df['average'] = df['average'].round(2)
+    return jsonify(df.to_dict(orient='records'))
 
 
 # ── POST add student ──────────────────────────────────────────────────────────

@@ -1,5 +1,6 @@
 import os
 import json
+import pandas as pd
 from student import Student
 
 _DATA_FILE = os.path.join(os.path.dirname(__file__), '..', 'data', 'students.json')
@@ -37,6 +38,19 @@ class StudentManager:
             if search_term.lower() in student.name.lower() or search_term == student.enrollment_no:
                 results.append(student)
         return results
+
+    def to_dataframe(self):
+        """Return current students as a pandas DataFrame with averages."""
+        records = []
+        for s in self.students:
+            records.append({
+                'enrollment_no': s.enrollment_no,
+                'name': s.name,
+                'age': s.age,
+                'marks': s.marks,
+                'average': s.get_average_marks()
+            })
+        return pd.DataFrame(records)
 
     def save_students_to_json(self, file_path=_DATA_FILE):
         with open(file_path, 'w') as f:
