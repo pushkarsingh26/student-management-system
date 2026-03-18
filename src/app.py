@@ -2,11 +2,16 @@
 
 import os
 import sys
+import io
+
+import matplotlib
+matplotlib.use('Agg')  # headless backend for server-side rendering
+import matplotlib.pyplot as plt
 
 # Make sure imports from this package work when run from anywhere
 sys.path.insert(0, os.path.dirname(__file__))
 
-from flask import Flask, request, jsonify, send_from_directory
+from flask import Flask, request, jsonify, send_from_directory, send_file
 from flask_cors import CORS
 from manager import StudentManager
 
@@ -16,6 +21,41 @@ app = Flask(__name__)
 CORS(app)
 manager = StudentManager()
 manager.load_students_from_json()
+
+
+def _avg_dataframe():
+    df = manager.to_dataframe()
+    if df.empty:
+        return None
+    df['average'] = df['average'].astype(float)
+    return df
+
+
+def _figure_to_png(fig):
+    buf = io.BytesIO()
+    fig.tight_layout()
+    fig.savefig(buf, format='png')
+    plt.close(fig)
+    buf.seek(0)
+    return buf
+
+
+def _bar_chart(df):
+    fig, ax = plt.subplots(figsize=(7, 4))
+    ax.bar(df['name'], df['average'], color="#4e79a7")
+    ax.set_xlabel('Student')
+    ax.set_ylabel('Average Marks')
+    ax.set_title('Average Marks per Student (Bar)')
+    ax.set_ylim(bottom=0)
+    ax.tick_params(axis='x', rotation=35)
+    return _figure_to_png(fig)
+
+
+def _pie_chart(df):
+    fig, ax = plt.subplots(figsize=(6, 6))
+    ax.pie(df['average'], labels=df['name'], autopct='%1.1f%%', startangle=120)
+    ax.set_title('Average Marks Share (Pie)')
+    return _figure_to_png(fig)
 
 
 # ── Serve frontend ────────────────────────────────────────────────────────────
@@ -32,6 +72,25 @@ def get_all_students():
         return jsonify([])
     df['average'] = df['average'].round(2)
     return jsonify(df.to_dict(orient='records'))
+
+
+# ── Charts: Average per student (bar & pie) ──────────────────────────────────
+@app.route('/api/charts/average/bar', methods=['GET'])
+def chart_average_bar():
+    df = _avg_dataframe()
+    if df is None:
+        return jsonify({'success': False, 'message': 'No data to chart.'}), 404
+    buf = _bar_chart(df)
+    return send_file(buf, mimetype='image/png')
+
+
+@app.route('/api/charts/average/pie', methods=['GET'])
+def chart_average_pie():
+    df = _avg_dataframe()
+    if df is None:
+        return jsonify({'success': False, 'message': 'No data to chart.'}), 404
+    buf = _pie_chart(df)
+    return send_file(buf, mimetype='image/png')
 
 
 # ── POST add student ──────────────────────────────────────────────────────────

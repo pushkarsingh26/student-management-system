@@ -4,3 +4,4 @@ pytest
 jsonschema
 pandas
 numpy
+matplotlib
