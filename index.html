@@ -208,6 +208,53 @@
             font-size: 0.9rem;
         }
 
+        /* Modal */
+        .modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.45);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            z-index: 1000;
+        }
+
+        .modal.open {
+            display: flex;
+        }
+
+        .modal-content {
+            background: #fff;
+            border-radius: 14px;
+            padding: 16px;
+            max-width: 880px;
+            width: 100%;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            position: relative;
+        }
+
+        .modal-body {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 16px;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: var(--danger);
+            padding: 6px 10px;
+        }
+
+        .chart-col img {
+            width: 100%;
+            height: auto;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+        }
+
         @media (max-width: 720px) {
             .subject-row {
                 grid-template-columns: 1fr;
@@ -315,6 +362,7 @@
                             <th>Name</th>
                             <th>Age</th>
                             <th>Marks</th>
+                            <th>Report</th>
                         </tr>
                     </thead>
                     <tbody id="search-results-body">
@@ -337,6 +385,7 @@
                             <th>Age</th>
                             <th>Marks</th>
                             <th>Average</th>
+                            <th>Report</th>
                         </tr>
                     </thead>
                     <tbody id="all-students-body">
@@ -347,6 +396,24 @@
         </section>
 
     </main>
+
+    <!-- Report Modal -->
+    <div id="report-modal" class="modal" aria-hidden="true">
+        <div class="modal-content">
+            <button class="modal-close" id="close-report">✕</button>
+            <h3 id="report-title">Student Report</h3>
+            <div class="modal-body">
+                <div class="chart-col">
+                    <h4>Bar Chart</h4>
+                    <img id="chart-bar" alt="Bar chart" />
+                </div>
+                <div class="chart-col">
+                    <h4>Pie Chart</h4>
+                    <img id="chart-pie" alt="Pie chart" />
+                </div>
+            </div>
+        </div>
+    </div>
 
     <footer>
         <p>&copy; 2026 Student Management System</p>
@@ -370,9 +437,15 @@
             return Object.entries(marks).map(([sub, m]) => `${sub}: ${m}`).join(', ');
         }
 
-        const API_BASE = window.location.port && window.location.port !== '5000'
-            ? `${window.location.protocol}//${window.location.hostname}:5000`
-            : '';
+        const API_BASE = (function() {
+            if (window.location.protocol === 'file:') {
+                return 'http://127.0.0.1:5000';
+            }
+            if (window.location.port && window.location.port !== '5000') {
+                return `${window.location.protocol}//${window.location.hostname}:5000`;
+            }
+            return '';
+        })();
 
         async function apiFetch(path, options = {}) {
             const response = await fetch(`${API_BASE}${path}`, options);
@@ -491,7 +564,8 @@
                     <td>${s.enrollment_no}</td>
                     <td>${s.name}</td>
                     <td>${s.age}</td>
-                    <td>${formatMarks(s.marks)}</td>`;
+                    <td>${formatMarks(s.marks)}</td>
+                    <td><button type="button" onclick="openReport('${s.enrollment_no}','${s.name}')">Report</button></td>`;
                 tbody.appendChild(tr);
             });
         });
@@ -520,10 +594,30 @@
                     <td>${s.name}</td>
                     <td>${s.age}</td>
                     <td>${formatMarks(s.marks)}</td>
-                    <td>${s.average}</td>`;
+                    <td>${s.average}</td>
+                    <td><button type="button" onclick="openReport('${s.enrollment_no}','${s.name}')">Report</button></td>`;
                 tbody.appendChild(tr);
             });
         });
+
+        // ── Report modal ─────────────────────────────────────────────────────
+        const reportModal = document.getElementById('report-modal');
+        const reportTitle = document.getElementById('report-title');
+        const chartBar    = document.getElementById('chart-bar');
+        const chartPie    = document.getElementById('chart-pie');
+        document.getElementById('close-report').addEventListener('click', () => {
+            reportModal.classList.remove('open');
+            chartBar.src = '';
+            chartPie.src = '';
+        });
+
+        window.openReport = function(enrollment_no, name) {
+            const ts = Date.now();
+            reportTitle.textContent = `Report: ${name} (${enrollment_no})`;
+            chartBar.src = `${API_BASE}/api/charts/student/${encodeURIComponent(enrollment_no)}/bar?ts=${ts}`;
+            chartPie.src = `${API_BASE}/api/charts/student/${encodeURIComponent(enrollment_no)}/pie?ts=${ts}`;
+            reportModal.classList.add('open');
+        }
     </script>
 
 </body>

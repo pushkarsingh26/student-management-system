@@ -58,6 +58,33 @@ def _pie_chart(df):
     return _figure_to_png(fig)
 
 
+def _student_chart(enrollment_no, chart_type):
+    student = next((s for s in manager.students if s.enrollment_no == enrollment_no), None)
+    if not student:
+        return None
+    marks = student.marks
+    if not marks:
+        return None
+
+    subjects = list(marks.keys())
+    values = list(marks.values())
+
+    if chart_type == 'bar':
+        fig, ax = plt.subplots(figsize=(6, 4))
+        ax.bar(subjects, values, color="#4e79a7")
+        ax.set_xlabel('Subject')
+        ax.set_ylabel('Marks')
+        ax.set_title(f"Marks for {student.name} ({student.enrollment_no})")
+        ax.set_ylim(bottom=0)
+        ax.tick_params(axis='x', rotation=30)
+    else:
+        fig, ax = plt.subplots(figsize=(6, 6))
+        ax.pie(values, labels=subjects, autopct='%1.1f%%', startangle=120)
+        ax.set_title(f"Marks Split for {student.name} ({student.enrollment_no})")
+
+    return _figure_to_png(fig)
+
+
 # ── Serve frontend ────────────────────────────────────────────────────────────
 @app.route('/')
 def index():
@@ -90,6 +117,23 @@ def chart_average_pie():
     if df is None:
         return jsonify({'success': False, 'message': 'No data to chart.'}), 404
     buf = _pie_chart(df)
+    return send_file(buf, mimetype='image/png')
+
+
+# ── Charts: per-student marks (bar & pie) ───────────────────────────────────
+@app.route('/api/charts/student/<enrollment_no>/bar', methods=['GET'])
+def chart_student_bar(enrollment_no):
+    buf = _student_chart(enrollment_no, 'bar')
+    if buf is None:
+        return jsonify({'success': False, 'message': 'No data for this student.'}), 404
+    return send_file(buf, mimetype='image/png')
+
+
+@app.route('/api/charts/student/<enrollment_no>/pie', methods=['GET'])
+def chart_student_pie(enrollment_no):
+    buf = _student_chart(enrollment_no, 'pie')
+    if buf is None:
+        return jsonify({'success': False, 'message': 'No data for this student.'}), 404
     return send_file(buf, mimetype='image/png')
 
 
