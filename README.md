@@ -1,81 +1,80 @@
 
 # Student Management System
 
-An all-in-one Student Management System for managing student records, built with Python. It supports both a terminal-based CLI and a modern web interface (Flask + HTML/JS).
+Python-based student records with both a terminal CLI and a Flask-powered web UI. Data persists to JSON; averages and charts use numpy/pandas/matplotlib.
 
-## What does this project help with?
-
-- Effortlessly add, delete, search, and view students
-- Calculate average marks for each student
-- Use either a terminal or a web browser
-- Data is saved in a JSON file for persistence
-
----
+## What this project helps with
+- Add, delete, search, and list students (CLI + web)
+- Compute averages (numpy) and serve chart visuals (matplotlib)
+- Persist data to JSON and expose it via a REST API
 
 ## Project Structure
-
 ```
 student-management-system/
 ├── src/
-│   ├── main.py         # Terminal CLI (text-based)
-│   ├── app.py          # Flask web server (REST API)
-│   ├── student.py      # Student class
-│   ├── manager.py      # StudentManager (core logic)
+│   ├── main.py         # Terminal CLI
+│   ├── app.py          # Flask API + charts
+│   ├── student.py      # Student model (numpy averages)
+│   ├── manager.py      # Core logic (pandas dataframe helper)
 │   ├── search.py       # Search helpers
 │   └── utils.py        # JSON utilities
-├── index.html          # Web frontend (fetches from Flask API)
+├── index.html          # Web frontend (fetch + charts modal)
 ├── data/
-│   └── students.json   # Student data (auto-saved)
-├── tests/
-│   ├── test_student.py
-│   ├── test_manager.py
-│   └── test_search.py
-├── requirements.txt    # Python dependencies
-└── README.md           # Project documentation
+│   └── students.json   # Stored student data
+├── tests/              # Pytest suite
+├── requirements.txt    # Dependencies
+└── README.md
 ```
 
----
+## Prerequisites
+- Python 3.10+ (venv recommended)
+- PowerShell on Windows (commands below assume PowerShell)
 
-## How to Run
-
-### 1. Clone and Install
-
-```sh
+## Setup (PowerShell)
+```powershell
 git clone <repository-url>
 cd student-management-system
 python -m venv .venv
-.venv/Scripts/activate  # On Windows
+.venv\Scripts\Activate.ps1
+pip install --upgrade pip
 pip install -r requirements.txt
 ```
 
-### 2. Run in Terminal (CLI)
-
-```sh
+## Running the Terminal CLI
+```powershell
+.venv\Scripts\Activate.ps1
 python src/main.py
 ```
-Follow the on-screen prompts to add, delete, search, and view students.
+Use the menu to add/delete/search/list students; data saves to data/students.json.
 
-### 3. Run as a Web App
-
-```sh
+## Running the Web App
+```powershell
+.venv\Scripts\Activate.ps1
 python src/app.py
 ```
-Then open [http://127.0.0.1:5000](http://127.0.0.1:5000) in your browser.
+Then open http://127.0.0.1:5000
 
----
+Web features:
+- Add/Delete/Search/List students (REST calls to Flask)
+- “Report” button per student opens a modal with bar/pie charts (matplotlib)
+- All-students bar/pie endpoints: /api/charts/average/bar and /api/charts/average/pie
 
-## Features
+## Key Endpoints
+- GET /api/students — list all
+- POST /api/students — add
+- DELETE /api/students/<enrollment_no> — delete
+- GET /api/students/<enrollment_no>/average — average marks
+- GET /api/students/search?q=term — search
+- GET /api/charts/student/<enrollment_no>/bar — per-student bar chart
+- GET /api/charts/student/<enrollment_no>/pie — per-student pie chart
+- GET /api/charts/average/bar — all-students bar chart
+- GET /api/charts/average/pie — all-students pie chart
 
-- Add new students (name, age, marks, enrollment number)
-- Delete students by enrollment number
-- Calculate and view average marks
-- Search by name or enrollment number
-- View all students in a table (web) or list (CLI)
-- Data is always saved to `data/students.json`
-
----
-
+## Tests
+```powershell
+.venv\Scripts\Activate.ps1
+pytest
+```
 
 ## License
-
 MIT
