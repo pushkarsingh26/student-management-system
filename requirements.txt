@@ -1,7 +1,7 @@
-Flask
-Flask-Cors
-pytest
-jsonschema
-pandas
-numpy
-matplotlib
+fastapi
+uvicorn
+sqlalchemy
+pydantic[email]
+python-jose[cryptography]
+passlib[bcrypt]
+python-multipart

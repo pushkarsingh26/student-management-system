@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Management System</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/css/theme.css">
+    <link rel="stylesheet" href="/css/layout.css">
+    <link rel="stylesheet" href="/css/components.css">
+</head>
+<body>
+    
+    <div id="login-screen" class="screen view-active">
+        <div class="login-container">
+            <div class="login-left">
+                <h2>Welcome Back</h2>
+                <p>Sign in to your Student Management Portal</p>
+                <form id="login-form">
+                    <div class="form-group">
+                        <label>Email Address</label>
+                        <i class="fa-regular fa-envelope"></i>
+                        <input type="email" id="login-email" required placeholder="admin@school.com" value="admin@school.com">
+                    </div>
+                    <div class="form-group">
+                        <label>Password</label>
+                        <i class="fa-solid fa-lock"></i>
+                        <input type="password" id="login-password" required placeholder="••••••••" value="admin123">
+                    </div>
+                    <p style="text-align:center; font-size:0.85rem; color:var(--text-muted); margin-bottom:15px;">
+                        Demo Credentials: <br><b>admin@school.com</b> / <b>admin123</b>
+                    </p>
+                    <p id="login-error" class="error-msg"></p>
+                    <button type="submit" class="btn btn-primary btn-block">Sign In</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div id="app-screen" class="screen">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <i class="fa-solid fa-graduation-cap"></i>
+                <h2>EduManage</h2>
+            </div>
+            <nav class="sidebar-nav">
+                <ul>
+                    <li class="nav-item active" data-view="dashboard"><i class="fa-solid fa-chart-pie"></i> Dashboard</li>
+                    <li class="nav-item" data-view="students"><i class="fa-solid fa-users"></i> Students</li>
+                    <li class="nav-item" data-view="attendance"><i class="fa-solid fa-calendar-check"></i> Attendance</li>
+                    <li class="nav-item" data-view="marks"><i class="fa-solid fa-award"></i> Marks & Grades</li>
+                    <li class="nav-item" data-view="ai-predictions"><i class="fa-solid fa-brain"></i> AI Insights</li>
+                </ul>
+            </nav>
+            <div class="sidebar-footer">
+                <button id="theme-toggle" class="btn btn-icon"><i class="fa-solid fa-moon"></i></button>
+                <button id="logout-btn" class="btn btn-danger"><i class="fa-solid fa-sign-out-alt"></i></button>
+            </div>
+        </aside>
+        
+        <main class="main-content">
+            <header class="topbar">
+                <div class="search-bar">
+                    <i class="fa-solid fa-search"></i>
+                    <input type="text" placeholder="Search globally...">
+                </div>
+                <div class="user-profile">
+                    <div class="user-info">
+                        <span id="header-user-name">Loading...</span>
+                        <span id="header-user-role" class="badge badge-primary">Role</span>
+                    </div>
+                    <img id="header-user-pic" src="https://ui-avatars.com/api/?name=User&background=random" alt="Profile">
+                </div>
+            </header>
+            
+            <div class="content-container" id="view-container">
+            </div>
+        </main>
+    </div>
+
+    <div id="toast-container"></div>
+    
+    <template id="tpl-dashboard">
+        <div class="dashboard-header animate-fade-in">
+            <h1>Overview</h1>
+            <p>Welcome back! Here's what's happening today.</p>
+        </div>
+        <div class="stats-grid animate-fade-up">
+            <div class="stat-card">
+                <div class="stat-icon bg-primary-light"><i class="fa-solid fa-user-graduate text-primary"></i></div>
+                <div class="stat-details">
+                    <h3>Total Students</h3>
+                    <h2 id="stat-students">--</h2>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon bg-success-light"><i class="fa-solid fa-chalkboard-user text-success"></i></div>
+                <div class="stat-details">
+                    <h3>Total Teachers</h3>
+                    <h2 id="stat-teachers">--</h2>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon bg-warning-light"><i class="fa-solid fa-book text-warning"></i></div>
+                <div class="stat-details">
+                    <h3>Total Courses</h3>
+                    <h2 id="stat-courses">--</h2>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon bg-danger-light"><i class="fa-solid fa-calendar-check text-danger"></i></div>
+                <div class="stat-details">
+                    <h3>Avg Attendance</h3>
+                    <h2 id="stat-attendance">--%</h2>
+                </div>
+            </div>
+        </div>
+        <div class="charts-section animate-fade-up" style="animation-delay: 0.1s">
+            <div class="chart-card">
+                <h3>Attendance Trends (Mock)</h3>
+                <canvas id="attendanceChart"></canvas>
+            </div>
+            <div class="chart-card">
+                <h3>System Usage (Mock)</h3>
+                <canvas id="marksChart"></canvas>
+            </div>
+        </div>
+    </template>
+    
+    <template id="tpl-students">
+        <div class="page-header animate-fade-in">
+            <div>
+                <h1>Students Directory</h1>
+                <p>Manage and search enrolled students</p>
+            </div>
+            <div class="page-actions">
+                <button class="btn btn-secondary" onclick="exportStudents()"><i class="fa-solid fa-download"></i> Export CSV</button>
+            </div>
+        </div>
+        
+        <div class="table-container animate-fade-up">
+            <div class="table-controls">
+                <div class="search-box">
+                    <i class="fa-solid fa-search"></i>
+                    <input type="text" id="student-search" placeholder="Search by name or EN..." onkeyup="debounceSearch()">
+                </div>
+            </div>
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Enrollment No.</th>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Age</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="student-table-body">
+                </tbody>
+            </table>
+            <div class="pagination" id="student-pagination">
+                <button class="btn btn-icon" id="prev-btn" onclick="prevPage()"><i class="fa-solid fa-chevron-left"></i></button>
+                <span id="page-info">Page 1</span>
+                <button class="btn btn-icon" id="next-btn" onclick="nextPage()"><i class="fa-solid fa-chevron-right"></i></button>
+            </div>
+        </div>
+    </template>
+    
+    <template id="tpl-attendance">
+        <div class="page-header animate-fade-in">
+            <h1>Attendance Tracking</h1>
+        </div>
+        <div class="card animate-fade-up">
+            <h3>Attendance UI ready to be integrated.</h3>
+        </div>
+    </template>
+
+    <template id="tpl-marks">
+        <div class="page-header animate-fade-in">
+            <h1>Marks & Grades</h1>
+        </div>
+        <div class="card animate-fade-up">
+            <h3>Marks UI ready to be integrated.</h3>
+        </div>
+    </template>
+
+    <template id="tpl-ai-predictions">
+        <div class="page-header animate-fade-in">
+            <h1>AI Smart Insights</h1>
+            <p>Predictive analytics for student performance based on historical data.</p>
+        </div>
+        <div class="card animate-fade-up">
+            <div class="form-group" style="max-width: 300px">
+                <label>Select Student ID to Predict</label>
+                <div style="display: flex; gap: 10px;">
+                    <input type="number" id="insight-student-id" value="1" class="form-control">
+                    <button class="btn btn-primary" onclick="getInsights()"><i class="fa-solid fa-bolt"></i> Generate</button>
+                </div>
+            </div>
+            <div id="insight-result" style="margin-top:20px; display:none;">
+                <div class="insight-box" id="insight-bg">
+                     <h3 id="ins-prediction" style="margin-top:0"></h3>
+                     <p><strong>Attendance Rate:</strong> <span id="ins-att"></span>%</p>
+                     <p><strong>Avg Score:</strong> <span id="ins-score"></span>%</p>
+                     <p><strong>Risk Level:</strong> <span class="badge" id="ins-risk"></span></p>
+                     <p style="margin-top:10px; font-weight:500;" id="ins-advice"></p>
+                </div>
+            </div>
+        </div>
+    </template>
+
+    <script src="/js/api.js"></script>
+    <script src="/js/auth.js"></script>
+    <script src="/js/dashboard.js"></script>
+    <script src="/js/students.js"></script>
+    <script src="/js/app.js"></script>
+</body>
+</html>
